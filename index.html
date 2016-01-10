@@ -4,6 +4,9 @@
         <meta charset="utf-8" />
         <title>EdgeBox</title>
         <link rel="stylesheet" href="css/style.css" type="text/css" />
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script src="js/keys.js" type="text/javascript"></script>
+        <script src="js/edgebox.js" type="text/javascript"></script>
     </head>
     
     <body>
@@ -14,6 +17,14 @@
             <label for="queryInput" id="queryLabel">Query</label><input type="text" name="queryInput" id="queryInput" /><br />
             <input type="button" value="Search" id="querySubmit" /><br/>
         </form>
+        </div>
+        
+        <div id="messenger"> <span id="message">Sorry. No results, try again.</span> </div>
+        
+        <div id="results">
+            <h2>Results:</h2>
+            <div id="sorted">
+            </div>
         </div>
     </body>
 
