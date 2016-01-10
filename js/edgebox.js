@@ -13,7 +13,8 @@ $(document).ready(function(){
 		    messenger.hide();
         main_container.children().remove(); 
         
-        var query = $("#queryInput").val(); 
+        var query = $("#queryInput").val();
+        var number_of_pictures = $("#countInput").val();
                 
         $.ajax({
             type: 'GET',
@@ -22,7 +23,7 @@ $(document).ready(function(){
             async: false,
             data: {
                 api_key: FLICKR_API_KEY,
-                per_page: 50,
+                per_page: number_of_pictures,
                 page: 1,
                 tags: query,
                 tagmode: "all", //"any"
@@ -35,7 +36,7 @@ $(document).ready(function(){
     $("#querySubmit").click(searchHandler);
     
     // on ENTER press down event
-    $("#queryInput").keydown( function(event){
+    $("#queryInput, #countInput").keydown( function(event){
         if(event.keyCode == 13){
             event.preventDefault(); 
             searchHandler();
