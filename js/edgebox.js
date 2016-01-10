@@ -2,9 +2,7 @@
  * EdgeBox script
  */
 
-/*
- * Entry point
- */
+// Entry point
 $(document).ready(function(){
     messenger = $("#messenger");
     message = $("#message"); 
@@ -46,9 +44,7 @@ $(document).ready(function(){
 
 });
 
-/*
- * Change layout of page
- */
+// Change layout of page to two comumns
 function changeLayout(){
     $("#query").css('float','left');
     $("#results").css('display','block');
@@ -57,18 +53,16 @@ function changeLayout(){
     $("h1").css('height',145);
 }
 
-/*
- * Flickr data processing
- */
+// Flickr data processing
 function processData(data){
-    // Show CONNECTION ERROR signal, connection to server possibly interrupted
+    // Connection Error
     if (data.stat != "ok"){
         message.text("Server connection lost.");
 		    messenger.show();
         return; 
     }
 
-    //show NOTHING FOUND signal if search come up empty
+    // Nothing Found
 	  if(data.photos.photo.length == 0){
 		    message.text("Sorry. No results, try again.");
 		    messenger.show();
@@ -83,9 +77,7 @@ function processData(data){
     }
 }
 
-/*
- * Get FLicker thumbnail
- */
+// Get Flickr thumbnail
 function getImageThumbnail(id){
     $.getJSON("https://api.flickr.com/services/rest/?method=flickr.photos.getSizes&jsoncallback=?",
     {
