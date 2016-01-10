@@ -1,12 +1,16 @@
 /**
  * EdgeBox script
  */
+ 
+$("head").append('<script async defer src="https://maps.googleapis.com/maps/api/js?key='+GOOGLE_API_KEY+'&callback=initMap"></script>');
 
 // Entry point
 $(document).ready(function(){
     messenger = $("#messenger");
     message = $("#message"); 
     main_container = $("#sorted");
+    
+    $("#tabs").tabs();
     
     var searchHandler = function(){
         changeLayout();
@@ -15,7 +19,6 @@ $(document).ready(function(){
         
         var query = $("#queryInput").val();
         var number_of_pictures = $("#countInput").val();
-        var selected_size = $("input:radio[name='group1']:checked").val();
                 
         $.ajax({
             type: 'GET',
@@ -70,17 +73,19 @@ function processData(data){
 		    messenger.show();
 		    return;
 	  }
+	  
+	  var selected_size = $("input:radio[name='group1']:checked").val();
 
     for (index = 0; index < data.photos.photo.length; index++){
         photo = data.photos.photo[index];
         main_container.append('<a href="https://www.flickr.com/photos/'+photo['owner']+'/'+photo['id']+'" class="'+photo['id']+'" title="'+photo['title']+'" target="_blank"><img /></a>');
         
-        getImageThumbnail(photo.id);
+        getImageThumbnail(photo.id, selected_size);
     }
 }
 
 // Get Flickr thumbnail
-function getImageThumbnail(id){
+function getImageThumbnail(id, selected_size){
     $.getJSON("https://api.flickr.com/services/rest/?method=flickr.photos.getSizes&jsoncallback=?",
     {
         api_key: FLICKR_API_KEY,
@@ -89,7 +94,7 @@ function getImageThumbnail(id){
     },
     function(id){
         return function(image){
-            $('.'+id+' img').attr('src',image.sizes.size[selected_size].source); //TODO
+            $('.'+id+' img').attr('src',image.sizes.size[selected_size].source);
         }
     }(id));
 }

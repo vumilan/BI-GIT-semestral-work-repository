@@ -14,6 +14,10 @@
  #queryLabel {display:none;}
  #queryInput {font-size: 1.2em; width: 90%;}
  #querySubmit {font-size: 1.2em;}
+ h2 {margin: 0.3em; font-weight: bold;}
+ #advSort {margin: 0 auto;}
+ #advSort td {border: 1px solid white; vertical-align: middle; padding: 2px;}
+ #advSort th {border: 1px solid white; vertical-align: middle; text-align: right; padding: 5px;}
 
  #query{
 	width: 40%;
@@ -23,6 +27,8 @@
  #sorted, #byGPS {
   font-size: 0; 
  }
+ 
+ #map_canvas {height: 250px;}
  
  /* Placeholder for results or error messages */
  #results, #messenger {
