@@ -15,6 +15,7 @@ $(document).ready(function(){
         
         var query = $("#queryInput").val();
         var number_of_pictures = $("#countInput").val();
+        var selected_size = $("input:radio[name='group1']:checked").val();
                 
         $.ajax({
             type: 'GET',
@@ -88,7 +89,7 @@ function getImageThumbnail(id){
     },
     function(id){
         return function(image){
-            $('.'+id+' img').attr('src',image.sizes.size[0].source);
+            $('.'+id+' img').attr('src',image.sizes.size[selected_size].source); //TODO
         }
     }(id));
 }
