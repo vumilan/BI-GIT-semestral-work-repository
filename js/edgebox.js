@@ -226,7 +226,7 @@ function sortImageDate(id){
                 return;
             }
             date = parseDate(info.photo.dates.taken);
-            score = (date.getTime()); //vzdalenot od dneska
+            score = (date.getTime());
             $('.'+id).attr("date", score);
             copyToContainer(date_container, id);
             sortContainer(date_container, "date", date_container.children("."+id), score, true);
