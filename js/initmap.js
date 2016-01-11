@@ -16,6 +16,8 @@ function initMap(){
     google.maps.event.addListener(marker, 'dragend', function(){
         updateCoords(marker.getPosition());    
     });
+    
+    geocoder = new google.maps.Geocoder();
 }
 
 function updateCoords(latLng){
@@ -27,4 +29,26 @@ function clearGPS(){
     marker.setMap(null);
     $('#gpsLatInput').val("");
     $('#gpsLonInput').val("");
+}
+
+$(document).ready(function(){
+    $("#zoomToSubmit").click(codeAddress);
+    $("#zoomTo").keydown(function(event){
+        if(event.keyCode == 13){
+            event.preventDefault(); 
+            codeAddress();
+        }
+    });
+});
+
+function codeAddress() {
+    var address = document.getElementById('zoomTo').value;
+    geocoder.geocode( { 'address': address}, function(results, status) {
+        if (status == google.maps.GeocoderStatus.OK) {
+            map.setCenter(results[0].geometry.location);
+            map.setZoom(8);
+        } else {
+            alert('Geocode was not successful for the following reason: ' + status);
+        }
+    });
 }
