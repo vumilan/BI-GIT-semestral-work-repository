@@ -1,10 +1,11 @@
 /**
  * EdgeBox script
  */
- 
+
+/** Include script for map handling */
 $("head").append('<script async defer src="https://maps.googleapis.com/maps/api/js?key='+GOOGLE_API_KEY+'&callback=initMap"></script>');
 
-// Entry point
+/** Prepare document actions and store important elements */
 $(document).ready(function(){
     messenger = $("#messenger");
     message = $("#message"); 
@@ -12,38 +13,6 @@ $(document).ready(function(){
     gps_container = $("#byGPS");
     
     $("#tabs").tabs();
-    
-    var searchHandler = function(){
-        changeLayout();
-		    messenger.hide();
-        main_container.children().remove();
-        gps_container.children().remove();
-        $("#gContainer").hide();
-        
-        var query = $("#queryInput").val();
-        var number_of_pictures = $("#countInput").val();
-        
-        var geo_force;
-        if($("#gpsForceInput").is(':checked')){
-            geo_force = 1;
-        }
-                
-        $.ajax({
-            type: 'GET',
-            url: "https://api.flickr.com/services/rest/?method=flickr.photos.search&jsoncallback=?",
-            dataType: 'json',
-            async: false,
-            data: {
-                api_key: FLICKR_API_KEY,
-                per_page: number_of_pictures,
-                page: 1,
-                tags: query,
-                has_geo: geo_force,
-                tagmode: "all", //"any"
-                format: "json"},
-            success: function(data){processData(data)}
-        });
-    }
 
     // onclick event 
     $("#querySubmit").click(searchHandler);
@@ -58,7 +27,44 @@ $(document).ready(function(){
 
 });
 
-// Change layout of page to two comumns
+/**
+ * Search for images by keywords in #queryInput
+ */
+function searchHandler(){
+    changeLayout();
+    messenger.hide();
+    main_container.children().remove();
+    gps_container.children().remove();
+    $("#gContainer").hide();
+    
+    var query = $("#queryInput").val();
+    var number_of_pictures = $("#countInput").val();
+    
+    var geo_force;
+    if($("#gpsForceInput").is(':checked')){
+        geo_force = 1;
+    }
+            
+    $.ajax({
+        type: 'GET',
+        url: "https://api.flickr.com/services/rest/?method=flickr.photos.search&jsoncallback=?",
+        dataType: 'json',
+        async: false,
+        data: {
+            api_key: FLICKR_API_KEY,
+            per_page: number_of_pictures,
+            page: 1,
+            tags: query,
+            has_geo: geo_force,
+            tagmode: "all", //"any"
+            format: "json"},
+        success: function(data){processData(data)}
+    });
+}
+
+/**
+ * Change layout of page to two columns
+ */
 function changeLayout(){
     $("#query").css('float','left');
     $("#results").css('display','block');
@@ -67,7 +73,10 @@ function changeLayout(){
     $("h1").css('height',145);
 }
 
-// Flickr data processing
+/**
+ * Flickr data processing
+ * @param {json} data - JSON encoded data returned from Flickr
+ */
 function processData(data){
     // Connection Error
     if (data.stat != "ok"){
@@ -98,7 +107,12 @@ function processData(data){
     }
 }
 
-// Get Flickr thumbnail
+/**
+ * Get Flickr thumbnail
+ * Separate API call is needed to get the URL of the image thumbnail
+ * @param {string} id         - ID of the picture
+ * @param {int} selected_size - Selected size of the thumbnails
+ */
 function getImageThumbnail(id, selected_size){
     $.getJSON("https://api.flickr.com/services/rest/?method=flickr.photos.getSizes&jsoncallback=?",
     {
@@ -113,7 +127,11 @@ function getImageThumbnail(id, selected_size){
     }(id));
 }
 
-// Get Flickr geo
+/**
+ * Sort images by geological information (distance from given point)
+ * Separate API call is needed to get the location
+ * @param {string} id - ID of the picture
+ */
 function sortImageLocation(id){
     $.getJSON("https://api.flickr.com/services/rest/?method=flickr.photos.geo.getLocation&jsoncallback=?",
     {
@@ -137,7 +155,11 @@ function sortImageLocation(id){
     }(id));
 }
 
-// Copy image to another container
+/**
+ * Copy image to another container
+ * @param {string} container - Name of the container where to copy to
+ * @param {string} id        - ID of the picture
+ */
 function copyToContainer(container, id){
     main_container.children("." + id).clone().appendTo(container);
 }
