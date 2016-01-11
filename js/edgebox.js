@@ -171,11 +171,11 @@ function toRad(degrees){
 }
 
 /**
- * Radi potomky kontejneru podle hodnoty v tagu
- * @param container jQuery element k serazeni 
- * @param tag 
- * @param element JQuery element z containeru, ktery je treba seradit 
- * @param score hodnota tagu elementu k porovnavani 
+ * Sorts children of given element according to value
+ * @param container - jQuery element to sort in
+ * @param tag       - Attribute for sorting
+ * @param element   - JQuery element inside container to be sorted
+ * @param score     - Value to sort against
  */
 function sortContainer(container, tag, element, score, descending){
     container.children().each(function(){
@@ -195,3 +195,4 @@ function sortContainer(container, tag, element, score, descending){
                                                 
     });
 }
+
