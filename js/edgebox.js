@@ -87,7 +87,7 @@ function processData(data){
         
         if($("#gpsLatInput").val().length > 0 && $("#gpsLonInput").val().length > 0){
             $("#gContainer").show();
-            //sortImageLocation(photo.id);
+            sortImageLocation(photo.id);
         }
     }
 }
@@ -105,5 +105,62 @@ function getImageThumbnail(id, selected_size){
             $('.'+id+' img').attr('src',image.sizes.size[selected_size].source);
         }
     }(id));
+}
+
+// Get Flickr geo
+function sortImageLocation(id){
+    $.getJSON("https://api.flickr.com/services/rest/?method=flickr.photos.geo.getLocation&jsoncallback=?",
+    {
+        api_key: FLICKR_API_KEY,
+        photo_id: id,
+        format: "json"
+    },
+    function(id) {
+        return function(geo){
+            if (geo.stat != "ok"){
+                console.log("NO GEO DATA AVAIABLE");
+                return;
+            }
+            lat = parseFloat($("#gpsLatInput").val());
+            lon = parseFloat($("#gpsLonInput").val());
+            var score = getGreatCircleDistance(toRad(lat), toRad(lon), toRad(geo.photo.location.latitude), toRad(geo.photo.location.longitude));
+            $('.'+id).attr("gps", score);
+            copyToContainer(gps_container, id);
+            //sortContainer(gps_container, "gps", gps_container.children("."+id), score, false);
+        }
+    }(id));
+}
+
+// Copy image to another container
+function copyToContainer(container, id){
+    main_container.children("." + id).clone().appendTo(container);
+}
+
+/**
+ * Returns distance in meters between two points on globe
+ * source: http://en.wikipedia.org/wiki/Great-circle_distance
+ * source2: http://www.movable-type.co.uk/scripts/latlong.html
+ * @param s_lat - start latitude in radians
+ * @param s_lon - start longitude in radians
+ * @param d_lat - destination latitude in radians
+ * @param d_lon - destination longitude in radians
+ * TODO - delta calculation implemented is not optimal yet faster viz.: sources
+ */
+function getGreatCircleDistance(s_lat, s_lon, d_lat, d_lon){
+    r = 6371009; 
+    
+    delta = Math.acos(Math.sin(s_lat)*Math.sin(d_lat) + 
+            Math.cos(s_lat)*Math.cos(d_lat) *
+            Math.cos(d_lon - s_lon));
+              
+    return (r*delta); 
+}
+
+/**
+ * Returns radians from degree value
+ * @param degrees 
+ */
+function toRad(degrees){
+    return degrees * (Math.PI/180);
 }
 
