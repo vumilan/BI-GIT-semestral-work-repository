@@ -12,7 +12,6 @@ $(document).ready(function(){
     main_container = $("#sorted");
     author_container = $( "#byAuthor" );
     gps_container = $("#byGPS");
-    date_container = $("#byDate");
     size_container = $("#bySize");
     
     $("#tabs").tabs();
@@ -21,7 +20,7 @@ $(document).ready(function(){
     $("#querySubmit").click(searchHandler);
     
     // on ENTER press down event
-    $("#queryInput, #countInput, #authorInput, #dateInput").keydown( function(event){
+    $("#queryInput, #countInput, #authorInput").keydown( function(event){
         if(event.keyCode == 13){
             event.preventDefault(); 
             searchHandler();
@@ -41,8 +40,6 @@ function searchHandler(){
     $("#aContainer").hide();
     gps_container.children().remove();
     $("#gContainer").hide();
-    date_container.children().remove();
-    $("#dContainer").hide();
     size_container.children().remove();
     $("#sContainer").hide();
     
@@ -119,11 +116,6 @@ function processData(data){
             sortImageLocation(photo.id);
         }
         
-        if($("#dateInput").is(':checked')){
-            $("#dContainer").show();
-            sortImageDate(photo.id);
-        }
-
         if($("#sizeInput").is(':checked')){
             $("#sContainer").show();
             sortImageSize(photo.id);
@@ -147,32 +139,6 @@ function getImageThumbnail(id, selected_size){
     function(id){
         return function(image){
             $('.'+id+' img').attr('src',image.sizes.size[selected_size].source);
-        }
-    }(id));
-}
-
-/**
- * Sort images by resolution
- * Separate API call is needed to get the location
- * @param {string} id - ID of the picture
- */
-function sortImageSize(id){
-    $.getJSON("https://api.flickr.com/services/rest/?method=flickr.photos.getSizes&jsoncallback=?",
-    {
-        api_key: FLICKR_API_KEY,
-        photo_id: id,
-        format: "json"
-    },
-    function(id){
-        return function(image){
-            variants = image.sizes.size;
-            biggest = variants[variants.length - 1];
-            size_score = parseInt(biggest['width']) * parseInt(biggest['height']);  
-                                
-            $('.'+id).attr("size", size_score);
-            copyToContainer(size_container, id);
-            sortContainer(size_container, "size", size_container.children('.'+id), size_score, true); 
-            
         }
     }(id));
 }
@@ -242,28 +208,27 @@ function sortImageAuthor(id, owner){
 }
 
 /**
- * Sort images by date
- * Separate API call is also needed to get information on the photo
+ * Sort images by resolution
+ * Separate API call is needed to get the location
  * @param {string} id - ID of the picture
  */
-function sortImageDate(id){
-    $.getJSON( "https://api.flickr.com/services/rest/?method=flickr.photos.getInfo&jsoncallback=?",
+function sortImageSize(id){
+    $.getJSON("https://api.flickr.com/services/rest/?method=flickr.photos.getSizes&jsoncallback=?",
     {
         api_key: FLICKR_API_KEY,
         photo_id: id,
         format: "json"
     },
-    function(id) {
-        return function(info){
-            if (info.stat != "ok"){
-                console.log("NO INFO DATA AVAIABLE");
-                return;
-            }
-            date = parseDate(info.photo.dates.taken);
-            score = (date.getTime());
-            $('.'+id).attr("date", score);
-            copyToContainer(date_container, id);
-            sortContainer(date_container, "date", date_container.children("."+id), score, true);
+    function(id){
+        return function(image){
+            variants = image.sizes.size;
+            biggest = variants[variants.length - 1];
+            size_score = parseInt(biggest['width']) * parseInt(biggest['height']);  
+                                
+            $('.'+id).attr("size", size_score);
+            copyToContainer(size_container, id);
+            sortContainer(size_container, "size", size_container.children('.'+id), size_score, true); 
+            
         }
     }(id));
 }
@@ -356,11 +321,3 @@ function getEditDistance(string1, string2){
 
     return dist; 
 }
-
-/** Parse a date in Flickr format */
-//TODO does this even work?
-function parseDate(input) {
-    var parts = input.match(/(\d+)/g);
-    return new Date(parts[0], parts[1]-1, parts[2], parts[3], parts[4], parts[5]); // months are 0-based
-}
-
