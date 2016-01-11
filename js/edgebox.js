@@ -22,6 +22,11 @@ $(document).ready(function(){
         
         var query = $("#queryInput").val();
         var number_of_pictures = $("#countInput").val();
+        
+        var geo_force;
+        if($("#gpsForceInput").is(':checked')){
+            geo_force = 1;
+        }
                 
         $.ajax({
             type: 'GET',
@@ -33,6 +38,7 @@ $(document).ready(function(){
                 per_page: number_of_pictures,
                 page: 1,
                 tags: query,
+                has_geo: geo_force,
                 tagmode: "all", //"any"
                 format: "json"},
             success: function(data){processData(data)}
