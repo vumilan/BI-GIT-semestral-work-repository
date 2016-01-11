@@ -118,7 +118,7 @@ function processData(data){
         
         if($("#dateInput").is(':checked')){
             $("#dContainer").show();
-            //sortImageDate(photo.id);
+            sortImageDate(photo.id);
         }
     }
 }
@@ -203,6 +203,33 @@ function sortImageAuthor(id, owner){
             $('.'+id).attr("user", score);
             copyToContainer(author_container, id);
             sortContainer(author_container, "user", author_container.children('.'+id), score, false);
+        }
+    }(id));
+}
+
+/**
+ * Sort images by date
+ * Separate API call is also needed to get information on the photo
+ * @param {string} id - ID of the picture
+ */
+function sortImageDate(id){
+    $.getJSON( "https://api.flickr.com/services/rest/?method=flickr.photos.getInfo&jsoncallback=?",
+    {
+        api_key: FLICKR_API_KEY,
+        photo_id: id,
+        format: "json"
+    },
+    function(id) {
+        return function(info){
+            if (info.stat != "ok"){
+                console.log("NO INFO DATA AVAIABLE");
+                return;
+            }
+            date = parseDate(info.photo.dates.taken);
+            score = (date.getTime()); //vzdalenot od dneska
+            $('.'+id).attr("date", score);
+            copyToContainer(date_container, id);
+            sortContainer(date_container, "date", date_container.children("."+id), score, true);
         }
     }(id));
 }
@@ -295,3 +322,11 @@ function getEditDistance(string1, string2){
 
     return dist; 
 }
+
+/** Parse a date in Flickr format */
+//TODO does this even work?
+function parseDate(input) {
+    var parts = input.match(/(\d+)/g);
+    return new Date(parts[0], parts[1]-1, parts[2], parts[3], parts[4], parts[5]); // months are 0-based
+}
+
