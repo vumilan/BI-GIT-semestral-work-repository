@@ -12,6 +12,7 @@ $(document).ready(function(){
     main_container = $("#sorted");
     author_container = $( "#byAuthor" );
     gps_container = $("#byGPS");
+    date_container = $("#byDate");
     
     $("#tabs").tabs();
 
@@ -19,7 +20,7 @@ $(document).ready(function(){
     $("#querySubmit").click(searchHandler);
     
     // on ENTER press down event
-    $("#queryInput, #countInput, #authorInput").keydown( function(event){
+    $("#queryInput, #countInput, #authorInput, #dateInput").keydown( function(event){
         if(event.keyCode == 13){
             event.preventDefault(); 
             searchHandler();
@@ -39,6 +40,8 @@ function searchHandler(){
     $("#aContainer").hide();
     gps_container.children().remove();
     $("#gContainer").hide();
+    date_container.children().remove();
+    $("#dContainer").hide();
     
     var query = $("#queryInput").val();
     var number_of_pictures = $("#countInput").val();
@@ -111,6 +114,11 @@ function processData(data){
         if($("#gpsLatInput").val().length > 0 && $("#gpsLonInput").val().length > 0){
             $("#gContainer").show();
             sortImageLocation(photo.id);
+        }
+        
+        if($("#dateInput").is(':checked')){
+            $("#dContainer").show();
+            //sortImageDate(photo.id);
         }
     }
 }
