@@ -132,7 +132,7 @@ function sortImageLocation(id){
             var score = getGreatCircleDistance(toRad(lat), toRad(lon), toRad(geo.photo.location.latitude), toRad(geo.photo.location.longitude));
             $('.'+id).attr("gps", score);
             copyToContainer(gps_container, id);
-            //sortContainer(gps_container, "gps", gps_container.children("."+id), score, false);
+            sortContainer(gps_container, "gps", gps_container.children("."+id), score, false);
         }
     }(id));
 }
@@ -170,3 +170,28 @@ function toRad(degrees){
     return degrees * (Math.PI/180);
 }
 
+/**
+ * Radi potomky kontejneru podle hodnoty v tagu
+ * @param container jQuery element k serazeni 
+ * @param tag 
+ * @param element JQuery element z containeru, ktery je treba seradit 
+ * @param score hodnota tagu elementu k porovnavani 
+ */
+function sortContainer(container, tag, element, score, descending){
+    container.children().each(function(){
+        
+        if (descending){
+            if (parseFloat($(this).attr(tag)) < parseFloat(score)){
+                $(this).before(element.detach());
+                return false; //break;
+            }
+        } else {
+            if (parseFloat($(this).attr(tag)) > parseFloat(score)){
+                $(this).before(element.detach());
+                return false; //break;
+            }
+        }                                 
+        return true; //continue;
+                                                
+    });
+}
