@@ -9,13 +9,16 @@ $(document).ready(function(){
     messenger = $("#messenger");
     message = $("#message"); 
     main_container = $("#sorted");
+    gps_container = $("#byGPS");
     
     $("#tabs").tabs();
     
     var searchHandler = function(){
         changeLayout();
 		    messenger.hide();
-        main_container.children().remove(); 
+        main_container.children().remove();
+        gps_container.children().remove();
+        $("#gContainer").hide();
         
         var query = $("#queryInput").val();
         var number_of_pictures = $("#countInput").val();
@@ -81,6 +84,11 @@ function processData(data){
         main_container.append('<a href="https://www.flickr.com/photos/'+photo['owner']+'/'+photo['id']+'" class="'+photo['id']+'" title="'+photo['title']+'" target="_blank"><img /></a>');
         
         getImageThumbnail(photo.id, selected_size);
+        
+        if($("#gpsLatInput").val().length > 0 && $("#gpsLonInput").val().length > 0){
+            $("#gContainer").show();
+            //sortImageLocation(photo.id);
+        }
     }
 }
 
