@@ -10,6 +10,7 @@ $(document).ready(function(){
     messenger = $("#messenger");
     message = $("#message"); 
     main_container = $("#sorted");
+    author_container = $( "#byAuthor" );
     gps_container = $("#byGPS");
     
     $("#tabs").tabs();
@@ -18,7 +19,7 @@ $(document).ready(function(){
     $("#querySubmit").click(searchHandler);
     
     // on ENTER press down event
-    $("#queryInput, #countInput").keydown( function(event){
+    $("#queryInput, #countInput, #authorInput").keydown( function(event){
         if(event.keyCode == 13){
             event.preventDefault(); 
             searchHandler();
@@ -34,6 +35,8 @@ function searchHandler(){
     changeLayout();
     messenger.hide();
     main_container.children().remove();
+    author_container.children().remove();
+    $("#aContainer").hide();
     gps_container.children().remove();
     $("#gContainer").hide();
     
@@ -100,6 +103,11 @@ function processData(data){
         
         getImageThumbnail(photo.id, selected_size);
         
+        if($("#authorInput").val().length > 0){
+            $("#aContainer").show();
+            sortImageAuthor(photo.id, photo.owner);
+        }
+        
         if($("#gpsLatInput").val().length > 0 && $("#gpsLonInput").val().length > 0){
             $("#gContainer").show();
             sortImageLocation(photo.id);
@@ -151,6 +159,42 @@ function sortImageLocation(id){
             $('.'+id).attr("gps", score);
             copyToContainer(gps_container, id);
             sortContainer(gps_container, "gps", gps_container.children("."+id), score, false);
+        }
+    }(id));
+}
+
+/**
+ * Sort images by geological information (distance from given point)
+ * Separate API call is needed to get the location
+ * @param {string} id    - ID of the picture
+ * @param {string} owner - ID of the user, for more information
+ */
+function sortImageAuthor(id, owner){
+    $.getJSON("https://api.flickr.com/services/rest/?method=flickr.people.getInfo&jsoncallback=?",
+    {
+        api_key: FLICKR_API_KEY,
+        user_id: owner,
+        format: "json"
+    },
+    function(id){
+        return function(user){
+            name = $("#authorInput").val();
+            username = 500;
+            realname = 500; //inicialization with crazy high value 
+
+            if ('username' in user.person){                             
+                username = getEditDistance(name, user.person.username._content);
+            }
+
+            if ('realname' in user.person){
+                realname = getEditDistance(name, user.person.realname._content);
+            }
+
+            //save score
+            score = Math.min(username, realname);
+            $('.'+id).attr("user", score);
+            copyToContainer(author_container, id);
+            sortContainer(author_container, "user", author_container.children('.'+id), score, false);
         }
     }(id));
 }
@@ -218,3 +262,28 @@ function sortContainer(container, tag, element, score, descending){
     });
 }
 
+/**
+ * Returns edit distance of two strings
+ */
+function getEditDistance(string1, string2){
+
+    var dist = 0; 
+    var a1 = string1.toLowerCase().split("");
+    var a2 = string2.toLowerCase().split("");
+    var smaller = a2;
+        
+    if (a1.length < a2.length){
+        dist += a2.length - a1.length;
+        smaller = a1;
+    } else {
+        dist += a1.length - a2.length; 
+    }
+        
+    for (index in smaller){
+        if(a1[index] != a2[index]){
+            dist++;
+        }
+    }
+
+    return dist; 
+}
